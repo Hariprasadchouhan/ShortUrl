@@ -32,22 +32,16 @@ public class URLShorteningServiceImpl implements URLShorteningService {
         data.forEach((key, value) -> {
             attributesValArray.add(value.toString());
         });
-        log.info("attributesValArray: {}", attributesValArray);
         String id=attributesValArray.get(0);
         String key=attributesValArray.get(1);
+
         int minLength=5;
 
         String longKey=generateLongKey(id,key);
-        log.info("longKey is :{}",longKey);
-
-
-
 
         String shortKey=generateShortKey(longKey,minLength);
-        log.info("shortKey is :{}",shortKey);
 
         ShortURL shortURL = new ShortURL(longKey,shortKey,data);
-        log.info("shortURL is :{}",shortURL);
 
         shortURLRepository.save(shortURL);
     }
@@ -56,17 +50,20 @@ public class URLShorteningServiceImpl implements URLShorteningService {
         //TODO logic of LongKey Generation
         String originalKey = id.concat("#").concat(key);
         String encryptedKey = Utils.encryptDecrypt(originalKey,"encrypt");
-        return Base64.getEncoder().encodeToString(encryptedKey.getBytes());
+        String base64EncodedKey = Base64.getEncoder().encodeToString(encryptedKey.getBytes());
+        return base64EncodedKey;
     }
-
-
 
     private String generateShortKey(String longKey,int minLength) {
         // TODO logic of shortKey generation.
         Hashids hashids = new Hashids("my-salt", minLength);
         int hash = Math.abs(longKey.hashCode());
-
         String hashidKey= hashids.encode(hash);
         return hashidKey.substring(0, minLength);
+    }
+    private String decryptedLongKey(String longKey,String decryptedKey) {
+        String decodedBase64 = new String(Base64.getDecoder().decode(longKey));
+        String originalCode=Utils.encryptDecrypt(decodedBase64,"decrypted");
+        return originalCode;
     }
 }

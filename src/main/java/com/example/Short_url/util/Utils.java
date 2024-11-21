@@ -2,8 +2,6 @@ package com.example.Short_url.util;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Base64;
 import java.util.stream.IntStream;
 import org.hashids.Hashids;
 
@@ -12,7 +10,7 @@ import org.hashids.Hashids;
 public class Utils {
 
 
-
+    // Decrypt and Encrypt
     public String encryptDecrypt(String text, String action) {
         StringBuffer stringBuffer = new StringBuffer();
         IntStream
@@ -21,19 +19,18 @@ public class Utils {
                     if(value % 2 == 0)
                         if("encrypt".equals(action))
                             stringBuffer.append((char) (text.charAt(value) + 4));
-                        else
+                        else if("decrypt".equals(action))
                             stringBuffer.append((char) (text.charAt(value) - 4));
                     else
                     if("encrypt".equals(action))
                         stringBuffer.append((char) (text.charAt(value) + 3));
-                    else
+                    else if("decrypt".equals(action))
                         stringBuffer.append((char) (text.charAt(value) - 3));
                 });
         return stringBuffer.toString();
     }
 
-
-
+    //ShortKey Generation
     public  String hashUrl(String url, int minLength) {
         Hashids hashids = new Hashids("my-salt", minLength);
         int hash = Math.abs(url.hashCode());

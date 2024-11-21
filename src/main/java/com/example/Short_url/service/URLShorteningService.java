@@ -4,5 +4,6 @@ import java.util.Map;
 
 public interface URLShorteningService {
 
-    public void generateURL(Map<String, Object> data);
+    public String generateURL(Map<String, Object> data);
+    public String getLongKey(String shortKey);
 }

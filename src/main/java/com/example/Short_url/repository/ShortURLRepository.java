@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ShortURLRepository extends MongoRepository<ShortURL, String> {
-    ShortURL findByShortURL(String shortURL);
+    ShortURL findByshortKey(String shortKey);
 }

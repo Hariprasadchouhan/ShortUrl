@@ -1,44 +1,53 @@
 package com.example.Short_url.service.impl;
 import com.example.Short_url.model.ServiceMapping;
-import com.example.Short_url.model.ShortURL;
+import com.example.Short_url.model.ShortUrl;
 import com.example.Short_url.repository.ServiceRepository;
-import com.example.Short_url.repository.ShortURLRepository;
-import com.example.Short_url.service.URLShorteningService;
+import com.example.Short_url.repository.ShortUrlRepository;
+import com.example.Short_url.service.UrlShorteningRedis;
+import com.example.Short_url.service.UrlShorteningService;
 import com.example.Short_url.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.*;
+
+import static java.lang.String.format;
+
 @Slf4j
 @Service
-public class URLShorteningServiceImpl implements URLShorteningService {
+public class UrlShorteningServiceImpl implements UrlShorteningService {
     @Autowired
-    private  ShortURLRepository shortURLRepository;
+    private ShortUrlRepository shortUrlRepository;
 
     @Autowired
     private ServiceRepository serviceRepository;
 
+    @Autowired
+    private UrlShorteningRedis urlShorteningRedis;
+
     // Logic for saving ShortKey and LongKey
     @Override
-    public String generateURL(Map<String, Object> data) {
+    public String generateUrl(Map<String, Object> data) {
         log.debug("Service request to generate URL for the data {}", data);
-        List<String> attributesValArray=new ArrayList<String>();
+        List<String> attributesValArray=new ArrayList<>();
         data.forEach((key, value) -> {attributesValArray.add(value.toString());});
+
         String serviceId=attributesValArray.get(0);
         String id=attributesValArray.get(1);
         String key= attributesValArray.get(2);
         int minLength=5;
+
         String longKey=generateLongKey(id,key);
-        log.info("longKey is :{}",longKey);
-        String decrypted=generateDecryptedKey(longKey);
-        log.info("decrypted :{}",decrypted);
+        ServiceMapping serviceMapping=serviceRepository.findByserviceId(serviceId);
+        String longUrl = format(serviceMapping.getUrlPattern(), longKey);
+//      String decrypted=generateDecryptedKey(longKey);
+
         String shortKey=generateShortKey(longKey,minLength);
-        log.info("shortKey is :{}",shortKey);
-        ShortURL shortURL = new ShortURL(serviceId,shortKey,longKey,data);
-        log.info("shortURL is :{}",shortURL);
-        shortURLRepository.save(shortURL);
-        return shortKey;
+        urlShorteningRedis.saveShortUrl(shortKey, longUrl);
+        ShortUrl shortUrl = new ShortUrl(shortKey,longUrl);
+        shortUrlRepository.save(shortUrl);
+        return format("https://licious.com/%s",shortKey);
     }
 
     //LongKey logic
@@ -67,26 +76,28 @@ public class URLShorteningServiceImpl implements URLShorteningService {
 
     @Override
     public String getLongKey(String shortKey){
-        ShortURL document =shortURLRepository.findByshortKey(shortKey);
-        log.info("Lonkey:{}",document);
-        String serviceId=document.getServiceId();
-        ServiceMapping serviceMapping= serviceRepository.findByserviceId(serviceId);
-        String service=serviceMapping.getService();
-        String longKey= document.getLongKey();
-        return String.format("http://licious.com/%s/%s", service, longKey);
+        String longUrl = urlShorteningRedis.getLongUrl(shortKey);
+        if (longUrl != null) {
+            log.info("Retrieved long URL from Redis: {}", longUrl);
+            return longUrl;
+        }
+        ShortUrl document =shortUrlRepository.findByshortKey(shortKey);
+        log.info("Retrived from database:{}",document);
+        return document.getLongUrl();
         }
 
     @Override
     public String addService(Map<String, Object> data) {
-        List<String> attributesValArray = new ArrayList<String>();
+        List<String> attributesValArray = new ArrayList<>();
         data.forEach((key, value) -> {
             attributesValArray.add(value.toString());
         });
         String serviceId = attributesValArray.get(0);
         String service = attributesValArray.get(1);
-        ServiceMapping serviceMapping = new ServiceMapping(serviceId, service);
+        String urlPattern=attributesValArray.get(2);
+        ServiceMapping serviceMapping = new ServiceMapping(serviceId, service,urlPattern);
         serviceRepository.save(serviceMapping);
-        return "Success";
+        return "Service added successfully";
     }
 
 }

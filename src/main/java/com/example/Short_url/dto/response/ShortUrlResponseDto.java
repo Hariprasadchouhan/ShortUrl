@@ -11,6 +11,5 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ShortUrlResponseDto {
-    private String shortKey;
-    private LocalDate createdOn;
+    private String shortUrl;
 }

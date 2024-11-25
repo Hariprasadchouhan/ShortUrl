@@ -2,7 +2,7 @@ package com.example.Short_url.controller;
 
 import com.example.Short_url.dto.response.ShortUrlRedirectionDto;
 import com.example.Short_url.dto.response.ShortUrlResponseDto;
-import com.example.Short_url.service.URLShorteningService;
+import com.example.Short_url.service.UrlShorteningService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,13 +18,13 @@ import java.util.Map;
 public class ShortUrlController {
 
     @Autowired
-    private URLShorteningService urlShorteningService;
+    private UrlShorteningService urlShorteningService;
 
     // generate shortKey
     @PostMapping("/generate")
     public ResponseEntity<ShortUrlResponseDto> generateShortUrl(@RequestBody Map<String, Object> data) {
         log.info("REST request to generate ShortUrl: {}", data);
-        ShortUrlResponseDto shortUrlResponseDto=new ShortUrlResponseDto(urlShorteningService.generateURL(data), LocalDate.now());
+        ShortUrlResponseDto shortUrlResponseDto=new ShortUrlResponseDto(urlShorteningService.generateUrl(data));
         return new ResponseEntity<>(shortUrlResponseDto,HttpStatus.OK);
     }
 
@@ -35,12 +35,6 @@ public class ShortUrlController {
         return new ResponseEntity<>(shortUrlRedirectionDto,HttpStatus.OK);
     }
 
-    @PostMapping("/service")
-    public String addService(@RequestBody Map<String,Object> data){
-        log.info("REST request to add Service: {}", data);
-        String output = urlShorteningService.addService(data);
-        return output;
-    }
 
 
 }

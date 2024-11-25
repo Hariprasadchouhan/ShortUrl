@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ShortURLDTO {
-    private String shortURL;
+public class ShortUrlDto {
+    private String shortUrL;
 }

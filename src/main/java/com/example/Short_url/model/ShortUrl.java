@@ -3,6 +3,7 @@ package com.example.Short_url.model;
 
 import lombok.*;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Map;
@@ -13,15 +14,16 @@ import java.util.Map;
 @NoArgsConstructor
 @Data
 @Document(collection = "ShortUrl")
-public class ShortURL {
+public class ShortUrl {
 
-    private String serviceId;
-
+    @Id
     private String shortKey;
 
-    private String longKey;
+    private String longUrl;
 
-    private Map<String,Object> attributeValues;
+//    private String serviceId;
+
+//    private Map<String,Object> attributeValues;
 
 
 }

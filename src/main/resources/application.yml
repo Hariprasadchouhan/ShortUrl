@@ -1,0 +1,58 @@
+#spring.application.name=mongoshorturl
+#spring.data.mongodb.uri=mongodb://localhost:27017/ShortUrl
+## Optional configuration
+#spring.data.mongodb.database=ShortUrl
+#spring.data.mongodb.host=localhost
+#spring.data.mongodb.port=27017
+#spring.data.mongodb.username=hariprasadlavudya
+#spring.data.mongodb.password=yHlcKkEpDksB93WF
+#spring.data.mongodb.authentication-database=admin
+
+
+#spring.application.name=ShortUrl
+#spring.data.mongodb.uri=mongodb://localhost:27017/ShortUrl
+## Optional configuration
+#spring.data.mongodb.database=your-database-name
+#spring.data.mongodb.host=localhost
+#spring.data.mongodb.port=27017
+#spring.data.mongodb.username=your-username
+#spring.data.mongodb.password=your-password
+#spring.data.mongodb.authentication-database=admin
+
+#application.service.ticket.baseURL=http://licious.com/{service}/${longKey}
+
+server:
+ appUrl: "http://localhost:8080${server.servlet.contextPath}"
+
+logging:
+ level:
+  root: INFO
+  com:
+   example:
+    Short_url:
+     filters:
+      CustomRequestLoggingFilter: DEBUG
+
+app:
+ name: ShortUrl
+ config:
+  mSiteBaseUrl: "http://localhost:8080"
+  shortKeyMinLength: 5
+
+spring:
+ application:
+  name: ${app.name}
+ data:
+  mongodb:
+   uri: "mongodb://localhost:27017/ShortUrl"
+   database: "your-database-name"
+   host: "localhost"
+   port: 27017
+   username: "your-username"
+   password: "your-password"
+   authentication-database: "admin"
+ redis:
+  host: "localhost"
+  port: 6379
+
+
